@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="card border-0 shadow rounded-4">
+        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center rounded-top-4">
+            <h4 class="mb-0 text-primary fw-bold">
+                <i class="bi bi-calendar-event me-2"></i> Booking Calendar
+            </h4>
+        </div>
+        <div class="card-body">
+            <div id="calendar"></div>
+        </div>
+    </div>
+</div>
+
+<!-- FullCalendar CSS -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+<!-- FullCalendar JS -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        events: {
+            url: '/api/bookings',
+            method: 'GET',
+            failure: function() {
+                Swal.fire('Error', 'Failed to load bookings.', 'error');
+            }
+        },
+        eventClick: function(info) {
+            const event = info.event;
+            const startTime = event.start?.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) || '';
+            const endTime = event.end?.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) || '';
+
+            Swal.fire({
+                title: '📋 Booking Details',
+                html: `
+                    <div style="text-align: left">
+                        <strong>Facility:</strong> ${event.title || 'N/A'}<br>
+                        <strong>Booked By:</strong> ${event.extendedProps.username || 'N/A'}<br>
+                        <strong>Department:</strong> ${event.extendedProps.department || 'N/A'}<br>
+                        <strong>Purpose:</strong> ${event.extendedProps.purpose || 'N/A'}<br>
+                        <strong>Time:</strong> ${startTime} - ${endTime}
+                    </div>
+                `,
+                icon: 'info',
+                confirmButtonText: 'Close',
+                customClass: {
+                    confirmButton: 'btn btn-primary'
+                },
+                buttonsStyling: false
+            });
+        },
+        eventTimeFormat: {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        },
+        height: 'auto',
+        contentHeight: 'auto'
+    });
+    calendar.render();
+});
+</script>
+
+<style>
+body {
+    background-color: #f8f9fc;
+}
+
+.card {
+    background-color: #ffffff;
+}
+
+#calendar {
+    width: 100%;
+    min-height: 600px;
+}
+
+/* FullCalendar Event Styling */
+.fc-event {
+    cursor: pointer;
+    background-color: #e3f2fd !important;
+    border: 1px solid #90caf9 !important;
+    color: #0d47a1 !important;
+    font-size: 0.85rem;
+    border-radius: 6px;
+    padding: 2px 4px;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.fc-event:hover {
+    background-color: #bbdefb !important;
+}
+
+/* Calendar Toolbar */
+.fc-toolbar-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #0d47a1;
+}
+
+.fc-button {
+    background-color: #0d47a1 !important;
+    border: none !important;
+    font-size: 0.9rem;
+    padding: 0.4em 0.7em;
+    border-radius: 0.25rem;
+    color: white;
+}
+
+.fc-button:hover {
+    background-color: #1565c0 !important;
+}
+
+@media (max-width: 768px) {
+    .fc-toolbar {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .fc-button {
+        width: 100%;
+    }
+}
+</style>
+{% endblock %}

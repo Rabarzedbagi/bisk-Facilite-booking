@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSRF Token Meta Tag -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{% block title %}BISK Facility Booking{% endblock %}</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- FullCalendar -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#205295',
+                        primaryDark: '#0A2647',
+                        secondary: '#F1F6F9',
+                        accent: '#F4D160',
+                        success: '#4CAF50',
+                        warning: '#FF9800',
+                        danger: '#E94560',
+                        info: '#2196F3',
+                        lightGray: '#f4f8fb'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+
+        // CSRF Token for AJAX requests
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+    </script>
+    <style>
+        .sidebar-transition {
+            transition: all 0.3s ease;
+        }
+        .dropdown-enter {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        .dropdown-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        .dropdown-exit {
+            opacity: 1;
+        }
+        .dropdown-exit-active {
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        .card-shadow {
+            box-shadow: 0 4px 24px 0 rgba(32,82,149,0.08);
+        }
+        .badge-primary-department {
+            background-color: #205295;
+            color: white;
+        }
+        .badge-secondary-department {
+            background-color: '#E94560';
+            color: white;
+        }
+        .tr-primary-department {
+            background-color: #eaf2fb;
+        }
+        .tr-secondary-department {
+            background-color: #fbeaec;
+        }
+        /* Fixed dropdown styles */
+        .group:hover .absolute {
+            display: block !important;
+        }
+        .absolute:hover {
+            display: block !important;
+        }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    <!-- Navigation -->
+    <nav class="bg-primaryDark text-white shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-3">
+                    <a href="{{ url_for('home') }}" class="flex items-center">
+                        <i class="fas fa-building text-accent text-2xl mr-2"></i>
+                        <span class="text-xl font-bold">BISK Facility</span>
+                    </a>
+                </div>
+
+                <!-- Admin Dropdown -->
+                {% if current_user.is_admin %}
+                <div class="group relative ml-auto">
+                    <button class="hover:text-accent transition-colors flex items-center py-2 px-3">
+                        <i class="fas fa-cog mr-1"></i> Admin
+                        <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                    </button>
+                    <div class="absolute right-0 pt-2 w-48">
+                        <div class="bg-white text-gray-800 rounded-md shadow-lg py-2 hidden group-hover:block z-10 -mt-1">
+                            <a href="{{ url_for('admin_users') }}" class="block px-4 py-2 hover:bg-gray-100">
+                                <i class="fas fa-users mr-2"></i> Manage Users
+                            </a>
+                            <a href="{{ url_for('manage_facilities') }}" class="block px-4 py-2 hover:bg-gray-100">
+                                <i class="fas fa-building mr-2"></i> Manage Facilities
+                            </a>
+                            <a href="{{ url_for('export_bookings') }}" class="block px-4 py-2 hover:bg-gray-100">
+                                <i class="fas fa-file-export mr-2"></i> Export Data
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-6">
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('dashboard') }}" class="hover:text-accent transition-colors {% if request.endpoint == 'dashboard' %}text-accent font-semibold{% endif %}">
+                            <i class="fas fa-tachometer-alt mr-1"></i> Dashboard
+                        </a>
+                        <a href="{{ url_for('book') }}" class="hover:text-accent transition-colors {% if request.endpoint == 'book' %}text-accent font-semibold{% endif %}">
+                            <i class="fas fa-plus-circle mr-1"></i> New Booking
+                        </a>
+                        <a href="{{ url_for('view_bookings') }}" class="hover:text-accent transition-colors {% if request.endpoint == 'view_bookings' %}text-accent font-semibold{% endif %}">
+                            <i class="fas fa-calendar-check mr-1"></i> My Bookings
+                        </a>
+                        <a href="{{ url_for('calendar_view') }}" class="hover:text-accent transition-colors {% if request.endpoint == 'calendar_view' %}text-accent font-semibold{% endif %}">
+                            <i class="fas fa-calendar-alt mr-1"></i> Calendar
+                        </a>
+                    {% endif %}
+                </div>
+
+                <!-- User Dropdown - Fixed Section -->
+                <div class="flex items-center space-x-4">
+                    <div class="group relative">
+                        <button class="flex items-center space-x-2">
+                            <div class="bg-accent text-primaryDark rounded-full w-8 h-8 flex items-center justify-center font-semibold">
+                                {% if current_user.is_authenticated %}
+                                    {{ current_user.username[0]|upper }}
+                                {% else %}
+                                    <i class="fas fa-user"></i>
+                                {% endif %}
+                            </div>
+                            <span class="hidden md:inline">
+                                {% if current_user.is_authenticated %}
+                                    {{ current_user.username }}
+                                {% else %}
+                                    Login
+                                {% endif %}
+                            </span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded-md shadow-lg py-2 hidden z-10">
+                            {% if current_user.is_authenticated %}
+                                <a href="{{ url_for('profile') }}" class="block px-4 py-2 hover:bg-gray-100">
+                                    <i class="fas fa-user-circle mr-2"></i> Profile
+                                </a>
+                                <!-- Logout Form with CSRF Token -->
+                                <form action="{{ url_for('logout') }}" method="POST" class="block">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="w-full text-left px-4 py-2 hover:bg-gray-100 text-danger">
+                                        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                    </button>
+                                </form>
+                            {% else %}
+                                <a href="{{ url_for('login') }}" class="block px-4 py-2 hover:bg-gray-100">
+                                    <i class="fas fa-sign-in-alt mr-2"></i> Login
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Mobile Menu Button -->
+                    <button id="mobile-menu-button" class="md:hidden text-white">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="md:hidden hidden py-4 px-4 border-t border-gray-700">
+                <div class="flex flex-col space-y-3">
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('dashboard') }}" class="hover:text-accent transition-colors">
+                            <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
+                        </a>
+                        <a href="{{ url_for('book') }}" class="hover:text-accent transition-colors">
+                            <i class="fas fa-plus-circle mr-2"></i> New Booking
+                        </a>
+                        <a href="{{ url_for('view_bookings') }}" class="hover:text-accent transition-colors">
+                            <i class="fas fa-calendar-check mr-2"></i> My Bookings
+                        </a>
+                        <a href="{{ url_for('calendar_view') }}" class="hover:text-accent transition-colors">
+                            <i class="fas fa-calendar-alt mr-2"></i> Calendar
+                        </a>
+
+                        {% if current_user.is_admin %}
+                        <div class="pt-2 border-t border-gray-700 mt-2">
+                            <p class="text-sm uppercase tracking-wider text-gray-400 mb-2">Admin</p>
+                            <a href="{{ url_for('admin_users') }}" class="block hover:text-accent transition-colors">
+                                <i class="fas fa-users mr-2"></i> Manage Users
+                            </a>
+                            <a href="{{ url_for('manage_facilities') }}" class="block hover:text-accent transition-colors">
+                                <i class="fas fa-building mr-2"></i> Manage Facilities
+                            </a>
+                            <a href="{{ url_for('export_bookings') }}" class="block hover:text-accent transition-colors">
+                                <i class="fas fa-file-export mr-2"></i> Export Data
+                            </a>
+                        </div>
+                        {% endif %}
+
+                        <!-- Mobile Logout Form with CSRF Token -->
+                        <div class="pt-2 border-t border-gray-700 mt-2">
+                            <form action="{{ url_for('logout') }}" method="POST" class="block">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="text-danger hover:text-red-400 transition-colors">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                </button>
+                            </form>
+                        </div>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="hover:text-accent transition-colors">
+                            <i class="fas fa-sign-in-alt mr-2"></i> Login
+                        </a>
+                        <a href="{{ url_for('register') }}" class="hover:text-accent transition-colors">
+                            <i class="fas fa-user-plus mr-2"></i> Register
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-6">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="mb-6 space-y-3">
+                    {% for category, message in messages %}
+                        <div class="p-4 rounded-lg border-l-4
+                            {% if category == 'success' %}bg-green-50 border-green-500 text-green-700
+                            {% elif category == 'danger' %}bg-red-50 border-red-500 text-red-700
+                            {% elif category == 'warning' %}bg-yellow-50 border-yellow-500 text-yellow-700
+                            {% else %}bg-blue-50 border-blue-500 text-blue-700{% endif %}">
+                            <div class="flex items-center">
+                                <i class="fas
+                                    {% if category == 'success' %}fa-check-circle
+                                    {% elif category == 'danger' %}fa-exclamation-circle
+                                    {% elif category == 'warning' %}fa-exclamation-triangle
+                                    {% else %}fa-info-circle{% endif %}
+                                    mr-3 text-lg"></i>
+                                <span>{{ message }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-primaryDark text-white py-6">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <h3 class="text-xl font-bold flex items-center">
+                        <i class="fas fa-building mr-2 text-accent"></i> BISK Facility Booking
+                    </h3>
+                    <p class="text-gray-300 mt-1">Efficient facility management for educational institutions</p>
+                </div>
+
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-300 hover:text-white">
+                        <i class="fab fa-facebook text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-300 hover:text-white">
+                        <i class="fab fa-twitter text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-300 hover:text-white">
+                        <i class="fab fa-linkedin text-xl"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-700 mt-6 pt-6 text-center text-gray-400">
+                <p>&copy; 2023 BISK Facility Booking System. Developed by Rabar.</p>
+                <p class="mt-2 text-sm">
+                    <a href="#" class="hover:text-white">BISK</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-button')?.addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('mobile-menu');
+            const menuButton = document.getElementById('mobile-menu-button');
+
+            if (menu && menuButton && !menu.contains(event.target) && !menuButton.contains(event.target)) {
+                menu.classList.add('hidden');
+            }
+        });
+
+        // User dropdown behavior - Fixed
+        const userDropdown = document.querySelector('.group.relative');
+        const userDropdownMenu = userDropdown?.querySelector('.absolute');
+
+        if (userDropdown && userDropdownMenu) {
+            let dropdownTimeout;
+
+            userDropdown.addEventListener('mouseenter', () => {
+                clearTimeout(dropdownTimeout);
+                userDropdownMenu.classList.remove('hidden');
+            });
+
+            userDropdown.addEventListener('mouseleave', () => {
+                dropdownTimeout = setTimeout(() => {
+                    if (!userDropdownMenu.matches(':hover')) {
+                        userDropdownMenu.classList.add('hidden');
+                    }
+                }, 300);
+            });
+
+            userDropdownMenu.addEventListener('mouseenter', () => {
+                clearTimeout(dropdownTimeout);
+            });
+
+            userDropdownMenu.addEventListener('mouseleave', () => {
+                userDropdownMenu.classList.add('hidden');
+            });
+        }
+
+        // Confirmation for destructive actions
+        document.querySelectorAll('[data-confirm]').forEach(button => {
+            button.addEventListener('click', (e) => {
+                if (!confirm(button.dataset.confirm)) {
+                    e.preventDefault();
+                }
+            });
+        });
+
+        // AJAX CSRF setup
+        document.addEventListener('DOMContentLoaded', function() {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+            // Set up AJAX to include CSRF token
+            if (typeof jQuery !== 'undefined') {
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRFToken': csrfToken
+                    }
+                });
+            }
+
+            // For vanilla JS fetch requests
+            window.fetchWithCSRF = async function(url, options = {}) {
+                const headers = new Headers(options.headers || {});
+                headers.append('X-CSRFToken', csrfToken);
+
+                if (options.body && typeof options.body === 'object' && !(options.body instanceof FormData)) {
+                    headers.append('Content-Type', 'application/json');
+                    options.body = JSON.stringify(options.body);
+                }
+
+                options.headers = headers;
+                return fetch(url, options);
+            };
+        });
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

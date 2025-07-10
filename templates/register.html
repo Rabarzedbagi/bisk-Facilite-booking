@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <div class="text-center">
+            <h2 class="mt-6 text-3xl font-extrabold text-gray-900">
+                Create a new account
+            </h2>
+        </div>
+
+        <form method="POST" action="{{ url_for('register') }}" class="mt-8 space-y-6">
+            {{ form.hidden_tag() }}  <!-- This includes the CSRF token -->
+
+            <div class="rounded-md shadow-sm -space-y-px">
+                <div>
+                    {{ form.username.label(class="sr-only") }}
+                    {{ form.username(class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm", placeholder="Username") }}
+                    {% for error in form.username.errors %}
+                        <span class="text-red-500 text-xs">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <div>
+                    {{ form.email.label(class="sr-only") }}
+                    {{ form.email(class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm", placeholder="Email address") }}
+                    {% for error in form.email.errors %}
+                        <span class="text-red-500 text-xs">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <div>
+                    {{ form.password.label(class="sr-only") }}
+                    {{ form.password(class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm", placeholder="Password") }}
+                    {% for error in form.password.errors %}
+                        <span class="text-red-500 text-xs">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <div>
+                    {{ form.confirm_password.label(class="sr-only") }}
+                    {{ form.confirm_password(class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm", placeholder="Confirm Password") }}
+                    {% for error in form.confirm_password.errors %}
+                        <span class="text-red-500 text-xs">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <div class="flex items-center">
+                    {{ form.terms(class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded") }}
+                    {{ form.terms.label(class="ml-2 block text-sm text-gray-900") }}
+                    {% for error in form.terms.errors %}
+                        <span class="text-red-500 text-xs">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <div>
+                    {{ form.department.label(class="block text-sm font-medium text-gray-700") }}
+                    {{ form.department(class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md") }}
+                    {% for error in form.department.errors %}
+                        <span class="text-red-500 text-xs">{{ error }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div>
+                <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primaryDark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                    Register
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

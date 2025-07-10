@@ -1,0 +1,16 @@
+<tr class="{% if booking.user.department == 'primary' %}tr-primary-department{% else %}tr-secondary-department{% endif %}">
+    <td>{{ booking.facility.name }}</td>
+    <td>{{ booking.date.strftime('%Y-%m-%d') }}</td>
+    <td>{{ booking.start_time.strftime('%H:%M') }} - {{ booking.end_time.strftime('%H:%M') }}</td>
+    <td>
+        <span class="badge {% if booking.user.department == 'primary' %}badge-primary-department{% else %}badge-secondary-department{% endif %}">
+            {{ booking.user.username }} ({{ booking.user.department|title }})
+        </span>
+    </td>
+    <td>{{ booking.purpose }}</td>
+    {% if show_actions %}
+    <td>
+        <!-- Your action buttons here -->
+    </td>
+    {% endif %}
+</tr>

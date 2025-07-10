@@ -1,0 +1,10 @@
+Reminder: Your booking at {{ booking.facility.name }} is coming up in 1 week
+
+Date: {{ booking.date.strftime('%Y-%m-%d') }}
+Time: {{ booking.start_time.strftime('%H:%M') }} to {{ booking.end_time.strftime('%H:%M') }}
+Purpose: {{ booking.purpose }}
+
+Please contact us if you need to make any changes.
+
+Best regards,
+BISK Facility Team

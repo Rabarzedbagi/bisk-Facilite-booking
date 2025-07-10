@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="card-shadow bg-white rounded-xl overflow-hidden">
+        <div class="bg-primary py-4 px-6 text-white">
+            <h2 class="text-2xl font-bold">
+                {% if current_user.is_admin %}Edit{% else %}View{% endif %} Booking
+            </h2>
+            <p class="text-sm opacity-80">Booking for {{ booking.facility.name }}</p>
+        </div>
+
+        <div class="p-6">
+            <!-- Flash messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="mb-4 p-4 rounded-lg {% if category == 'success' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% if current_user.is_admin %}
+            <form method="POST" action="{{ url_for('edit_booking', booking_id=booking.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            {% endif %}
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Facility Selector -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Facility</label>
+                        {% if current_user.is_admin %}
+                            <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
+                                    id="facility" name="facility" required>
+                                {% for facility in facilities %}
+                                    <option value="{{ facility.id }}"
+                                        {% if facility.id == booking.facility_id %}selected{% endif %}>
+                                        {{ facility.name }} ({{ facility.type }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        {% else %}
+                            <div class="p-2 bg-gray-50 rounded-lg">
+                                {{ booking.facility.name }} ({{ booking.facility.type }})
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Date Picker -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                        {% if current_user.is_admin %}
+                            <input type="date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
+                                   id="date" name="date"
+                                   value="{{ booking.date.strftime('%Y-%m-%d') if booking.date else '' }}"
+                                   min="{{ min_date }}"
+                                   max="{{ max_date }}"
+                                   required>
+                        {% else %}
+                            <div class="p-2 bg-gray-50 rounded-lg">
+                                {{ booking.date.strftime('%B %d, %Y') }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Time Selectors -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
+                        {% if current_user.is_admin %}
+                            <input type="time" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
+                                   id="start_time" name="start_time"
+                                   value="{{ booking.start_time.strftime('%H:%M') if booking.start_time else '' }}"
+                                   required>
+                        {% else %}
+                            <div class="p-2 bg-gray-50 rounded-lg">
+                                {{ booking.start_time.strftime('%I:%M %p') }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">End Time</label>
+                        {% if current_user.is_admin %}
+                            <input type="time" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
+                                   id="end_time" name="end_time"
+                                   value="{{ booking.end_time.strftime('%H:%M') if booking.end_time else '' }}"
+                                   required>
+                        {% else %}
+                            <div class="p-2 bg-gray-50 rounded-lg">
+                                {{ booking.end_time.strftime('%I:%M %p') }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Purpose Field -->
+                <div class="mt-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Purpose</label>
+                    {% if current_user.is_admin %}
+                        <textarea class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
+                                  id="purpose" name="purpose" rows="3" required>{{ booking.purpose }}</textarea>
+                    {% else %}
+                        <div class="p-2 bg-gray-50 rounded-lg">
+                            {{ booking.purpose }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Form Actions -->
+                <div class="mt-8 flex justify-end space-x-3">
+                    <a href="{{ url_for('view_bookings') }}"
+                       class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                        Back to Bookings
+                    </a>
+                    {% if current_user.is_admin %}
+                        <button type="submit"
+                                class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primaryDark transition-colors">
+                            Update Booking
+                        </button>
+                    {% endif %}
+                </div>
+
+            {% if current_user.is_admin %}
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,144 @@
+:root {
+  --primary: #205295;
+  --primary-dark: #0A2647;
+  --secondary: #F1F6F9;
+  --accent: #F4D160;
+  --danger: #E94560;
+  --success: #4CAF50;
+  --info: #2196F3;
+  --warning: #FF9800;
+  --white: #fff;
+  --gray: #bfc9d1;
+  --light-bg: #f4f8fb;
+}
+
+body {
+  background: linear-gradient(120deg, var(--secondary) 0%, var(--light-bg) 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--primary-dark);
+}
+
+.navbar {
+  background: var(--primary);
+  border-radius: 0 0 12px 12px;
+  margin-bottom: 2rem;
+}
+
+.navbar .navbar-brand {
+  font-weight: 700;
+  color: var(--accent) !important;
+  letter-spacing: 1px;
+}
+
+.navbar-nav .nav-link {
+  color: var(--white) !important;
+}
+
+.navbar-nav .nav-link.active, .navbar-nav .nav-link:hover {
+  color: var(--accent) !important;
+}
+
+.card {
+  border: none;
+  border-radius: 1.2rem;
+  box-shadow: 0 4px 24px 0 rgba(32,82,149,0.08);
+  background: var(--white);
+}
+
+.card-header {
+  background: linear-gradient(90deg, var(--primary) 70%, var(--accent) 100%);
+  color: var(--white);
+  border-radius: 1.2rem 1.2rem 0 0;
+  font-weight: 600;
+}
+
+.btn {
+  border-radius: 0.6rem;
+  font-weight: 500;
+  min-width: 120px;
+  transition: background 0.2s;
+}
+
+.btn-primary, .btn-success, .btn-info, .btn-danger, .btn-warning {
+  color: var(--white) !important;
+}
+
+.btn-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.btn-primary:hover, .btn-primary:focus {
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+
+.btn-success {
+  background: var(--success);
+  border-color: var(--success);
+}
+.btn-danger {
+  background: var(--danger);
+  border-color: var(--danger);
+}
+.btn-warning {
+  background: var(--warning);
+  border-color: var(--warning);
+}
+.btn-info {
+  background: var(--info);
+  border-color: var(--info);
+}
+
+.alert {
+  border-radius: 0.7em;
+  font-size: 1rem;
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.table th, .table td {
+  vertical-align: middle;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: var(--light-bg);
+}
+
+/* Department Highlighting */
+.badge-primary-department {
+  background: var(--primary);
+  color: var(--white);
+}
+.badge-secondary-department {
+  background: var(--danger);
+  color: var(--white);
+}
+.tr-primary-department {
+  background: #eaf2fb;
+}
+.tr-secondary-department {
+  background: #fbeaec;
+}
+
+/* Booking status badge */
+.badge-upcoming { background: var(--success); color: #fff; }
+.badge-completed { background: var(--gray); color: #222; }
+
+/* Footer */
+footer {
+  background: var(--primary-dark);
+  color: var(--white);
+  text-align: center;
+  padding: 1em 0;
+  border-radius: 16px 16px 0 0;
+  margin-top: 3rem;
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  .navbar { border-radius: 0; }
+  .card { border-radius: 1rem; }
+  .container { padding: 8px; }
+}

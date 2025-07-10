@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header Section -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Edit User Profile</h1>
+            <p class="text-gray-500 mt-1">Update user information and permissions</p>
+        </div>
+        <a href="{{ url_for('view_user', user_id=user.id) }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+            </svg>
+            Back to User
+        </a>
+    </div>
+
+    <!-- Form Card -->
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+        <form method="POST" action="{{ url_for('edit_user', user_id=user.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <!-- Form Sections -->
+            <div class="border-t border-gray-200 px-4 py-5 sm:p-6">
+                <!-- Basic Information -->
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Basic Information</h3>
+                        <p class="mt-1 text-sm text-gray-500">Update the user's basic details</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                        <!-- Username -->
+                        <div class="sm:col-span-3">
+                            <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+                            <div class="mt-1">
+                                <input type="text" id="username" name="username" value="{{ user.username }}" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2 px-3 border">
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="sm:col-span-3">
+                            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                            <div class="mt-1">
+                                <input type="email" id="email" name="email" value="{{ user.email }}" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2 px-3 border">
+                            </div>
+                        </div>
+
+                        <!-- Department -->
+                        <div class="sm:col-span-3">
+                            <label for="department" class="block text-sm font-medium text-gray-700">Department</label>
+                            <div class="mt-1">
+                                <select id="department" name="department" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2 px-3 border">
+                                    <option value="primary" {% if user.department == 'primary' %}selected{% endif %}>Primary</option>
+                                    <option value="secondary" {% if user.department == 'secondary' %}selected{% endif %}>Secondary</option>
+                                    <option value="administration" {% if user.department == 'administration' %}selected{% endif %}>Administration</option>
+                                    <option value="other" {% if user.department == 'other' %}selected{% endif %}>Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Permissions Section -->
+                <div class="mt-8 pt-8 border-t border-gray-200 space-y-6">
+                    <div>
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Account Permissions</h3>
+                        <p class="mt-1 text-sm text-gray-500">Manage user roles and access</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- Admin Toggle -->
+                        <div class="relative flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="is_admin" name="is_admin" type="checkbox" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded" {% if user.is_admin %}checked{% endif %}>
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="is_admin" class="font-medium text-gray-700">Administrator Access</label>
+                                <p class="text-gray-500">Grants full system access and privileges</p>
+                            </div>
+                        </div>
+
+                        <!-- Active Status Toggle -->
+                        <div class="relative flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="is_active" name="is_active" type="checkbox" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded" {% if user.is_active %}checked{% endif %}>
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="is_active" class="font-medium text-gray-700">Active Account</label>
+                                <p class="text-gray-500">Enable or disable this user account</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
+                <div class="flex justify-end space-x-3">
+                    <a href="{{ url_for('view_user', user_id=user.id) }}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Cancel
+                    </a>
+                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

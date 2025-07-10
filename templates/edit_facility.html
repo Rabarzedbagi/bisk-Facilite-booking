@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header Section -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">
+                {% if facility %}Edit{% else %}Add New{% endif %} Facility
+            </h1>
+            <p class="text-gray-500 mt-1">
+                {% if facility %}Update existing facility details{% else %}Create a new facility for bookings{% endif %}
+            </p>
+        </div>
+        <a href="{{ url_for('manage_facilities') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+            </svg>
+            Back to Facilities
+        </a>
+    </div>
+
+    <!-- Form Card -->
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+        <form method="POST" action="{% if facility %}{{ url_for('edit_facility', facility_id=facility.id) }}{% else %}{{ url_for('add_facility') }}{% endif %}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="px-4 py-5 sm:p-6 space-y-6">
+                <!-- Facility Name -->
+                <div class="sm:grid sm:grid-cols-3 sm:gap-4">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700">Facility Name *</label>
+                        <p class="mt-1 text-sm text-gray-500">The display name for the facility</p>
+                    </div>
+                    <div class="mt-1 sm:mt-0 sm:col-span-2">
+                        <input type="text" id="name" name="name" value="{{ facility.name if facility }}" required
+                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2 px-3 border">
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="sm:grid sm:grid-cols-3 sm:gap-4">
+                    <div>
+                        <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                        <p class="mt-1 text-sm text-gray-500">Brief details about the facility</p>
+                    </div>
+                    <div class="mt-1 sm:mt-0 sm:col-span-2">
+                        <textarea id="description" name="description" rows="3"
+                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2 px-3 border">{{ facility.description if facility }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Capacity and Location -->
+                <div class="sm:grid sm:grid-cols-3 sm:gap-4">
+                    <div>
+                        <label for="max_capacity" class="block text-sm font-medium text-gray-700">Maximum Capacity</label>
+                        <p class="mt-1 text-sm text-gray-500">Maximum number of people allowed</p>
+                    </div>
+                    <div class="mt-1 sm:mt-0 sm:col-span-2">
+                        <input type="number" id="max_capacity" name="max_capacity" value="{{ facility.max_capacity if facility and facility.max_capacity }}"
+                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2 px-3 border">
+                    </div>
+                </div>
+
+                <!-- Booking Rules -->
+                <div class="sm:grid sm:grid-cols-3 sm:gap-4">
+                    <div>
+                        <label for="booking_rules" class="block text-sm font-medium text-gray-700">Booking Rules</label>
+                        <p class="mt-1 text-sm text-gray-500">Guidelines for facility usage</p>
+                    </div>
+                    <div class="mt-1 sm:mt-0 sm:col-span-2">
+                        <textarea id="booking_rules" name="booking_rules" rows="4"
+                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2 px-3 border">{{ facility.booking_rules if facility }}</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
+                <div class="flex justify-end space-x-3">
+                    <a href="{{ url_for('manage_facilities') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Cancel
+                    </a>
+                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                        {% if facility %}Update{% else %}Create{% endif %} Facility
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Enhance form input focus states */
+    input:focus, textarea:focus, select:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        border-color: rgba(99, 102, 241, 0.8);
+    }
+
+    /* Smooth transitions for interactive elements */
+    button, a, input, textarea {
+        transition: all 0.2s ease;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 640px) {
+        .sm\:grid-cols-3 {
+            grid-template-columns: 1fr;
+        }
+        .sm\:col-span-2 {
+            grid-column: span 1;
+        }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,13 @@
+Dear {{ user.username }},
+
+Your booking for {{ booking.facility.name }} has been confirmed.
+
+Details:
+- Date: {{ booking.date.strftime('%Y-%m-%d') }}
+- Time: {{ booking.start_time.strftime('%H:%M') }} to {{ booking.end_time.strftime('%H:%M') }}
+- Purpose: {{ booking.purpose }}
+
+Thank you for using our booking system.
+
+Best regards,
+BISK Facility Team

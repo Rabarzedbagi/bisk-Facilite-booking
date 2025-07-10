@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary to-primaryDark">
+    <div class="text-center text-white max-w-2xl px-4">
+        <h1 class="text-5xl font-bold mb-6">BISK Facility Booking System</h1>
+        <p class="text-xl mb-8">Efficiently manage school facility bookings with our intuitive platform</p>
+        <div class="flex justify-center space-x-4">
+            <a href="{{ url_for('login') }}" class="bg-accent hover:bg-accentDark text-primaryDark font-bold py-3 px-6 rounded-lg text-lg transition-colors">
+                Login
+            </a>
+            {% if not current_user %}
+            <a href="{{ url_for('register') }}" class="bg-white hover:bg-gray-100 text-primaryDark font-bold py-3 px-6 rounded-lg text-lg transition-colors">
+                Register
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="profile-wrapper">
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="avatar-circle">{{ user.username|first|upper }}</div>
+        <div class="profile-details">
+            <h1>{{ user.username }}</h1>
+            <p>
+                <i class="fas fa-envelope"></i> {{ user.email }} <br>
+                <i class="fas fa-building"></i> {{ user.department|capitalize }} <br>
+                <i class="fas fa-calendar-alt"></i> Joined {{ user.created_at.strftime('%b %Y') }}
+            </p>
+        </div>
+        <div class="profile-actions">
+
+        </div>
+    </div>
+
+    <!-- Dashboard Section -->
+    <div class="dashboard-layout">
+        <!-- Bookings -->
+        <div class="dashboard-card">
+            <div class="card-title">
+                <h2><i class="fas fa-calendar-alt"></i> Recent Bookings</h2>
+                <a href="{{ url_for('view_bookings') }}" class="view-link">View All</a>
+            </div>
+            {% if bookings %}
+                {% for booking in bookings %}
+                <div class="booking-item">
+                    <div>
+                        <strong>{{ booking.facility.name }}</strong><br>
+                        <small>
+                            <i class="fas fa-calendar-day"></i> {{ booking.date.strftime('%a, %b %d') }} |
+                            <i class="fas fa-clock"></i> {{ booking.start_time.strftime('%I:%M %p') }} - {{ booking.end_time.strftime('%I:%M %p') }}
+                        </small>
+                        <p>{{ booking.purpose }}</p>
+                    </div>
+                    <div class="booking-right">
+                        <span class="badge {{ booking.status }}">{{ booking.status|capitalize }}</span>
+                        <a href="{{ url_for('view_booking', booking_id=booking.id) }}"><i class="fas fa-chevron-right"></i></a>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-box">
+                    <i class="fas fa-calendar-plus fa-2x"></i>
+                    <p>No bookings yet</p>
+                    <a href="{{ url_for('book') }}" class="btn">Book a Facility</a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Stats -->
+        <div class="dashboard-card">
+            <div class="card-title">
+                <h2><i class="fas fa-chart-bar"></i> Your Stats</h2>
+            </div>
+            <div class="stat-grid">
+                <div>
+                    <h3>{{ bookings|length }}</h3>
+                    <p>Total Bookings</p>
+                </div>
+                <div>
+                    <h3>{{ upcoming_count }}</h3>
+                    <p>Upcoming</p>
+                </div>
+                <div>
+                    <h3>{{ approved_count }}</h3>
+                    <p>Approved</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+:root {
+    --primary: #5d5fef;
+    --accent: #f5f7ff;
+    --gray: #6b7280;
+    --white: #ffffff;
+    --success: #10b981;
+    --warning: #f59e0b;
+}
+
+body {
+    background-color: var(--accent);
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+}
+
+.profile-wrapper {
+    max-width: 1100px;
+    margin: 2rem auto;
+    padding: 1rem;
+}
+
+.profile-header {
+    background: linear-gradient(120deg, var(--primary), #7b7df4);
+    padding: 2rem;
+    border-radius: 16px;
+    color: white;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2rem;
+}
+
+.avatar-circle {
+    width: 70px;
+    height: 70px;
+    background-color: var(--accent);
+    color: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.profile-details h1 {
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+.profile-details p {
+    margin: 0.5rem 0 0 0;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.profile-actions {
+    margin-left: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.btn-outline {
+    background: white;
+    color: var(--primary);
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background 0.3s ease;
+}
+
+.btn-outline.secondary {
+    background-color: rgba(255,255,255,0.15);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.4);
+}
+
+.btn-outline:hover {
+    background-color: var(--accent);
+    color: var(--primary);
+}
+
+.dashboard-layout {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+}
+
+.dashboard-card {
+    background: var(--white);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+}
+
+.card-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--primary);
+}
+
+.booking-item {
+    border-top: 1px solid #e5e7eb;
+    padding: 1rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.booking-item p {
+    margin: 0.3rem 0 0;
+    font-size: 0.9rem;
+    color: var(--gray);
+}
+
+.badge {
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.badge.approved {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+}
+
+.badge.pending {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+}
+
+.booking-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.empty-box {
+    text-align: center;
+    padding: 2rem;
+    color: var(--gray);
+}
+
+.btn {
+    background-color: var(--primary);
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    margin-top: 1rem;
+    display: inline-block;
+}
+
+.stat-grid {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+    padding-top: 1rem;
+}
+
+.stat-grid h3 {
+    color: var(--primary);
+    margin: 0;
+}
+
+.stat-grid p {
+    margin: 0.2rem 0;
+    color: var(--gray);
+    font-size: 0.85rem;
+}
+
+@media (max-width: 768px) {
+    .dashboard-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .profile-actions {
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}

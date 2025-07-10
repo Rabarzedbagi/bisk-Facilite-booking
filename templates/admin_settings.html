@@ -1,0 +1,25 @@
+{% extends 'admin.html' %}
+{% block content %}
+<h2>System Settings</h2>
+<form method="post" class="settings-form">
+  <div>
+    <label>Site Name</label>
+    <input type="text" name="site_name" value="{{ settings.site_name }}">
+  </div>
+  <div>
+    <label>Maintenance Mode</label>
+    <select name="maintenance_mode">
+      <option value="off" {% if settings.maintenance_mode == 'off' %}selected{% endif %}>Off</option>
+      <option value="on" {% if settings.maintenance_mode == 'on' %}selected{% endif %}>On</option>
+    </select>
+  </div>
+  <div>
+    <label>Theme</label>
+    <select name="theme">
+      <option value="light" {% if settings.theme == 'light' %}selected{% endif %}>Light</option>
+      <option value="dark" {% if settings.theme == 'dark' %}selected{% endif %}>Dark</option>
+    </select>
+  </div>
+  <button type="submit">Save Settings</button>
+</form>
+{% endblock %}

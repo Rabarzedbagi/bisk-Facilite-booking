@@ -1,0 +1,7 @@
+Reminder: Your booking at {{ booking.facility.name }} starts in 30 minutes
+
+Time: {{ booking.start_time.strftime('%H:%M') }} to {{ booking.end_time.strftime('%H:%M') }}
+Location: {{ booking.facility.description }}
+
+Best regards,
+BISK Facility Team
